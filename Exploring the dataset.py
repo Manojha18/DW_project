@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-# %matplotlib inline
+#%matplotlib inline
 
 data = pd.read_csv('E:/Summer 18/Data management warehousing and analytics/Project/911.csv')
 print(data.head())
@@ -20,4 +20,25 @@ top_zip_5 = pd.DataFrame(data['zip'].value_counts().head(5))
 top_zip_5.reset_index(inplace=True)
 top_zip_5.columns = ['ZIP', 'Total_Count']
 print(top_zip_5)
+
+# TOP 5 CITIES FOR EMERGENCY CALLS
+top_twp_5 = pd.DataFrame(data['twp'].value_counts().head(5))
+top_twp_5.reset_index(inplace=True)
+top_twp_5.columns=['TWP', 'Total_count']
+print(top_twp_5.head())
+
+# VISUALIZATION
+top_5_plot = plt.figure(figsize=(5,5))
+sns.barplot(x='ZIP', y='Total_Count', data=top_zip_5)
+top_5_plot.tight_layout()
+plt.show()
+
+top_twp_plot = plt.figure(figsize=(5,5))
+label_twp=sns.barplot(x='TWP', y='Total_count', data= top_twp_5, palette="viridis")
+label_twp.set_xticklabels(label_twp.get_xticklabels(),rotation=90)
+plt.show()
+
+
+
+
 
