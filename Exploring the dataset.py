@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.neighbors import KernelDensity
-#%matplotlib inline
+
 
 data = pd.read_csv('E:/Summer 18/Data management warehousing and analytics/Project/911.csv')
 print(data.head())
@@ -133,7 +133,7 @@ print(Pop_density.head(1))
 A=Pop_density[['lat','lng']]
 B=Pop_density.drop(['lat','lng'],axis=1)
 
-# Population of each cluster
+# Approximating Population of each cluster
 
 
 kd=KernelDensity()
