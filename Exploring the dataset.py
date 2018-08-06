@@ -5,6 +5,7 @@ import seaborn as sns
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.neighbors import KernelDensity
 #%matplotlib inline
 
 data = pd.read_csv('E:/Summer 18/Data management warehousing and analytics/Project/911.csv')
@@ -52,10 +53,9 @@ print(data['STA'].head(2))
 
 print(data['label'].value_counts())
 # Splitting hour,days of week, month and date from timeStamp
-data['Hour'] = data.timeStamp.map(lambda x: pd.to_datetime(x).hour) #own
-data['Days'] = data.timeStamp.map(lambda x: pd.to_datetime(x).dayofweek) #own
-data['Month'] = data.timeStamp.map(lambda x: pd.to_datetime(x).month) #own
-
+data['Hour'] = data.timeStamp.map(lambda x: pd.to_datetime(x).hour)
+data['Days'] = data.timeStamp.map(lambda x: pd.to_datetime(x).dayofweek)
+data['Month'] = data.timeStamp.map(lambda x: pd.to_datetime(x).month)
 
 # Converting day values to strings
 days = {0: 'Monday',
@@ -125,22 +125,17 @@ print("Area of the Township {} sq. km".format(Area_t))
 
 population=np.int(Area_t*314)
 print("Avg Population of the Township {}".format(population))
-
-
 cluster=pd.concat([geo_ana.reset_index().drop('index',axis=1),pd.DataFrame(kmeans.labels_,columns=['C'])],axis=1)
 cluster.head(2)
-
 d_c=pd.concat([geo_ana.reset_index().drop('index',axis=1),pd.DataFrame(kmeans.labels_,columns=['C'])],axis=1)
 Pop_density=d_c.groupby(['lat','lng']).count().reset_index().drop(['zip','twp','label','Hour','Days','Month','STA','C','x_lg','y_lt'],axis=1)
-
 print(Pop_density.head(1))
-
 A=Pop_density[['lat','lng']]
 B=Pop_density.drop(['lat','lng'],axis=1)
 
 # Population of each cluster
 
-from sklearn.neighbors import KernelDensity
+
 kd=KernelDensity()
 kd.fit(A,B)
 avg=np.exp(kd.score_samples(A)).mean()
@@ -164,14 +159,14 @@ a_c=pd.DataFrame(poly.fit_transform(d_c[['lat','lng']]),columns=['1','lat','lng'
 X_quad=pd.DataFrame(poly.fit_transform(A),columns=['1','lat','lng','lat^2','lat*lng','lng^2'])
 
 
-quad_model=LinearRegression()
-quad_model.fit(X_quad,B)
-popdense=pd.DataFrame(quad_model.predict(a_c).ravel(),columns=["Pop_D"])
-data_clus=pd.concat([d_c,popdense],axis=1)
-print(data_clus.head(2))
+q_model=LinearRegression()
+q_model.fit(X_quad,B)
+popdense=pd.DataFrame(q_model.predict(a_c).ravel(),columns=["Pop_D"])
+d_c=pd.concat([d_c,popdense],axis=1)
+print(d_c.head(2))
 
 # Grouping by clusters
-p_c=d_c.groupby('C').mean()['Pop. Density'].as_matrix()
+p_c=d_c.groupby('C').mean()['Pop_D'].as_matrix()
 print(p_c)
 p_f=np.round(p_c*100)/100
 print(p_f)
